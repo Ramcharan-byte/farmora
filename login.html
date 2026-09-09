@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login - Farmora</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #f8f6ef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 430px;
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 32px;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #18351f;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #ccc;
+            border-radius: 9px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2e7d32;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 9px;
+            background: #2e7d32;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .login-btn:hover {
+            background: #256628;
+        }
+
+        .login-btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .message {
+            display: none;
+            margin-top: 18px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .message.success {
+            display: block;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .message.error {
+            display: block;
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+        }
+
+        .signup-link a {
+            color: #2e7d32;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .home-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .home-link a {
+            color: #555;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <div class="logo">🌱 Farmora</div>
+
+        <p class="subtitle">
+            Login to your Farmora account
+        </p>
+
+        <form id="loginForm">
+
+            <!-- EMAIL -->
+            <div class="form-group">
+                <label for="email">Email Address</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    required
+                >
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="form-group">
+                <label for="password">Password</label>
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter your password"
+                    required
+                >
+            </div>
+
+            <!-- ROLE -->
+            <div class="form-group">
+                <label for="role">Login As</label>
+
+                <select id="role" required>
+                    <option value="">Select your role</option>
+                    <option value="farmer">👨‍🌾 Farmer</option>
+                    <option value="buyer">🛒 Buyer</option>
+                </select>
+            </div>
+
+            <!-- LOGIN BUTTON -->
+            <button
+                type="submit"
+                class="login-btn"
+                id="loginButton"
+            >
+                Login
+            </button>
+
+        </form>
+
+        <!-- MESSAGE -->
+        <div id="message" class="message"></div>
+
+        <div class="signup-link">
+            Don't have an account?
+            <a href="signup.html">Create Account</a>
+        </div>
+
+        <div class="home-link">
+            <a href="index.html">← Back to Farmora</a>
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // ==========================================
+        // FARMORA BACKEND
+        // ==========================================
+
+        const SERVER = "http://localhost:5000";
+
+
+        // ==========================================
+        // ELEMENTS
+        // ==========================================
+
+        const loginForm = document.getElementById("loginForm");
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+        const roleInput = document.getElementById("role");
+        const loginButton = document.getElementById("loginButton");
+        const message = document.getElementById("message");
+
+
+        // ==========================================
+        // SHOW MESSAGE
+        // ==========================================
+
+        function showMessage(text, type) {
+
+            message.textContent = text;
+
+            message.className = "message " + type;
+
+            message.style.display = "block";
+        }
+
+
+        // ==========================================
+        // LOGIN
+        // ==========================================
+
+        loginForm.addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            const role = roleInput.value;
+
+
+            // ------------------------------------------
+            // CHECK ROLE
+            // ------------------------------------------
+
+            if (!role) {
+
+                showMessage(
+                    "Please select Farmer or Buyer.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            // ------------------------------------------
+            // DISABLE BUTTON
+            // ------------------------------------------
+
+            loginButton.disabled = true;
+
+            loginButton.textContent = "Logging in...";
+
+
+            showMessage(
+                "Checking your account...",
+                "success"
+            );
+
+
+            try {
+
+                // ======================================
+                // SEND LOGIN REQUEST TO SERVER
+                // ======================================
+
+                const response = await fetch(
+                    SERVER + "/api/login",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        credentials: "include",
+
+                        body: JSON.stringify({
+                            email: email,
+                            password: password,
+                            role: role
+                        })
+                    }
+                );
+
+
+                // ======================================
+                // READ SERVER RESPONSE
+                // ======================================
+
+                const data = await response.json();
+
+
+                console.log("LOGIN RESPONSE:", data);
+
+
+                // ======================================
+                // LOGIN FAILED
+                // ======================================
+
+                if (!response.ok) {
+
+                    showMessage(
+                        data.message || "Login failed.",
+                        "error"
+                    );
+
+                    loginButton.disabled = false;
+
+                    loginButton.textContent = "Login";
+
+                    return;
+                }
+
+
+                // ======================================
+                // LOGIN SUCCESSFUL
+                // ======================================
+
+                console.log("Login successful!");
+
+                console.log("User:", data.user);
+
+                console.log("Role:", data.user.role);
+
+
+                // ======================================
+                // SAVE USER
+                // ======================================
+
+                localStorage.setItem(
+                    "farmoraCurrentUser",
+                    JSON.stringify(data.user)
+                );
+
+
+                // ======================================
+                // SHOW SUCCESS
+                // ======================================
+
+                showMessage(
+                    "Login successful! Redirecting...",
+                    "success"
+                );
+
+
+                // ======================================
+                // REDIRECT BASED ON ROLE
+                // ======================================
+
+                if (data.user.role === "farmer") {
+
+                    console.log(
+                        "Redirecting to farmer page..."
+                    );
+
+                    setTimeout(function() {
+
+                        window.location.href =
+                            SERVER + "/farmer.html";
+
+                    }, 500);
+
+                }
+
+                else if (data.user.role === "buyer") {
+
+                    console.log(
+                        "Redirecting to buyer page..."
+                    );
+
+                    setTimeout(function() {
+
+                        window.location.href =
+                            SERVER + "/buyer.html";
+
+                    }, 500);
+
+                }
+
+                else {
+
+                    showMessage(
+                        "Invalid account role.",
+                        "error"
+                    );
+
+                    loginButton.disabled = false;
+
+                    loginButton.textContent = "Login";
+                }
+
+            }
+
+
+            // ==========================================
+            // SERVER CONNECTION ERROR
+            // ==========================================
+
+            catch (error) {
+
+                console.error(
+                    "LOGIN ERROR:",
+                    error
+                );
+
+                showMessage(
+                    "Cannot connect to Farmora server. Make sure the backend is running on port 5000.",
+                    "error"
+                );
+
+                loginButton.disabled = false;
+
+                loginButton.textContent = "Login";
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>

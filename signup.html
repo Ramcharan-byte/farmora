@@ -1,0 +1,326 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Farmora - Sign Up</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #f8f6ef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+        }
+
+        .logo {
+            text-align: center;
+            color: #123524;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            color: #18351f;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 18px;
+            border: 1px solid #ccc;
+            border-radius: 9px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2e7d32;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 9px;
+            background: #2e7d32;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #256628;
+        }
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 18px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #b71c1c;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+        }
+
+        .login-link a {
+            color: #2e7d32;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">🌱 Farmora</div>
+
+    <div class="subtitle">
+        Create your Farmora account
+    </div>
+
+    <form id="signupForm">
+
+        <label for="name">Full Name</label>
+        <input
+            type="text"
+            id="name"
+            placeholder="Enter your full name"
+            required
+        >
+
+        <label for="email">Email</label>
+        <input
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            required
+        >
+
+        <label for="phone">Phone Number</label>
+        <input
+            type="tel"
+            id="phone"
+            placeholder="Enter your phone number"
+            required
+        >
+
+        <label for="password">Password</label>
+        <input
+            type="password"
+            id="password"
+            placeholder="Create a password"
+            required
+        >
+
+        <label for="confirmPassword">Confirm Password</label>
+        <input
+            type="password"
+            id="confirmPassword"
+            placeholder="Confirm your password"
+            required
+        >
+
+        <label for="role">Account Type</label>
+        <select id="role" required>
+            <option value="">Select account type</option>
+            <option value="farmer">👨‍🌾 Farmer</option>
+            <option value="buyer">🛒 Buyer</option>
+        </select>
+
+        <button type="submit" id="signupButton">
+            Create Account
+        </button>
+
+    </form>
+
+    <div id="message" class="message"></div>
+
+    <div class="login-link">
+        Already have an account?
+        <a href="login.html">Login</a>
+    </div>
+
+</div>
+
+<script>
+
+const signupForm = document.getElementById("signupForm");
+const signupButton = document.getElementById("signupButton");
+const message = document.getElementById("message");
+
+signupForm.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword =
+        document.getElementById("confirmPassword").value;
+    const role = document.getElementById("role").value;
+
+    message.style.display = "none";
+
+    // Password check
+    if (password !== confirmPassword) {
+        showMessage("Passwords do not match.", "error");
+        return;
+    }
+
+    // Password length
+    if (password.length < 6) {
+        showMessage(
+            "Password must contain at least 6 characters.",
+            "error"
+        );
+        return;
+    }
+
+    // Role check
+    if (!role) {
+        showMessage(
+            "Please select Farmer or Buyer.",
+            "error"
+        );
+        return;
+    }
+
+    signupButton.disabled = true;
+    signupButton.textContent = "Creating Account...";
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:5000/api/signup",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                credentials: "include",
+
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    password: password,
+                    role: role
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            showMessage(
+                "Account created successfully! Redirecting to Login...",
+                "success"
+            );
+
+            signupForm.reset();
+
+            setTimeout(function() {
+                window.location.href = "login.html";
+            }, 1500);
+
+        } else {
+
+            showMessage(
+                data.message || "Signup failed.",
+                "error"
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error("Signup error:", error);
+
+        showMessage(
+            "Cannot connect to Farmora server. Make sure the server is running.",
+            "error"
+        );
+
+    } finally {
+
+        signupButton.disabled = false;
+        signupButton.textContent = "Create Account";
+
+    }
+
+});
+
+
+function showMessage(text, type) {
+
+    message.textContent = text;
+
+    message.className = "message " + type;
+
+    message.style.display = "block";
+}
+
+</script>
+
+</body>
+</html>
+```

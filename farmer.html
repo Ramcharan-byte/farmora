@@ -1,0 +1,2420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Farmora - Farmer Dashboard</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f8f3;
+            color: #18351f;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        nav {
+            background: #123524;
+            color: white;
+            padding: 15px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #9ccc65;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links a,
+        .logout-btn {
+            color: white;
+            text-decoration: none;
+            padding: 9px 15px;
+            border-radius: 7px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .nav-links a:hover {
+            background: #2e7d32;
+        }
+
+        .logout-btn {
+            background: #c62828;
+        }
+
+        /* ================= HERO ================= */
+
+        .hero {
+            background: linear-gradient(
+                135deg,
+                #123524,
+                #2e7d32
+            );
+
+            color: white;
+            padding: 55px 7%;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            font-size: 18px;
+        }
+
+        /* ================= CONTAINER ================= */
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 35px auto;
+        }
+
+        /* ================= CARDS ================= */
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            color: #123524;
+        }
+
+        /* ================= VOICE ================= */
+
+        .voice-box {
+            background: #eaf6ea;
+            border: 2px solid #b7d9b7;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .voice-box h2 {
+            margin-bottom: 10px;
+        }
+
+        .voice-box p {
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .voice-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .language-select {
+            padding: 12px;
+            border: 1px solid #bbb;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .mic-btn {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        .mic-btn:hover {
+            background: #1b5e20;
+        }
+
+        .transcript {
+            background: white;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 50px;
+            color: #555;
+        }
+
+        /* ================= FORM ================= */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #2e7d32;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .add-btn {
+            margin-top: 20px;
+            padding: 14px 25px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .add-btn:hover {
+            background: #1b5e20;
+        }
+
+        /* ================= PRODUCTS ================= */
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid #e1e1e1;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .product-icon {
+            font-size: 45px;
+            margin-bottom: 10px;
+        }
+
+        .product-card h3 {
+            color: #2e7d32;
+            margin-bottom: 12px;
+        }
+
+        .product-card p {
+            line-height: 1.7;
+            color: #555;
+        }
+
+        .product-price {
+            font-size: 22px;
+            font-weight: bold;
+            color: #123524;
+            margin-top: 12px;
+        }
+
+        /* ================= ORDERS ================= */
+
+        .orders-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .order-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .order-header h3 {
+            color: #123524;
+        }
+
+        .status-badge {
+            padding: 7px 12px;
+            border-radius: 20px;
+            background: #eaf6ea;
+            color: #2e7d32;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .order-details {
+            line-height: 1.9;
+            color: #555;
+        }
+
+        .order-details hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 12px 0;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .accept-btn,
+        .reject-btn {
+            border: none;
+            padding: 11px 17px;
+            border-radius: 7px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .accept-btn {
+            background: #2e7d32;
+        }
+
+        .accept-btn:hover {
+            background: #1b5e20;
+        }
+
+        .reject-btn {
+            background: #c62828;
+        }
+
+        .reject-btn:hover {
+            background: #8e0000;
+        }
+
+        .empty {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            color: #777;
+        }
+
+        /* ================= LOADING ================= */
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero h1 {
+                font-size: 30px;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     FARMER LOGIN PROTECTION
+====================================================== -->
+
+<script>
+
+(async function checkFarmerLogin() {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:5000/api/me",
+            {
+                credentials: "include"
+            }
+        );
+
+        if (!response.ok) {
+
+            window.location.href =
+                "login.html";
+
+            return;
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !data.user ||
+            data.user.role !== "farmer"
+        ) {
+
+            alert(
+                "This page is only available for Farmer accounts."
+            );
+
+            window.location.href =
+                "buyer.html";
+
+            return;
+        }
+
+
+        console.log(
+            "✅ Farmer authenticated:",
+            data.user.name
+        );
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Authentication error:",
+            error
+        );
+
+        window.location.href =
+            "login.html";
+
+    }
+
+})();
+
+</script>
+
+
+<!-- =====================================================
+     NAVBAR
+====================================================== -->
+
+<nav>
+
+    <div class="logo">
+        🌱 Farm<span>ora</span>
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="index.html">
+            Home
+        </a>
+
+        <a href="buyer.html">
+            🛒 Buy Produce
+        </a>
+
+        <button
+            class="logout-btn"
+            onclick="logout()"
+        >
+            Logout
+        </button>
+
+    </div>
+
+</nav>
+
+
+<!-- =====================================================
+     HERO
+====================================================== -->
+
+<section class="hero">
+
+    <h1>
+        👨‍🌾 Farmer Dashboard
+    </h1>
+
+    <p>
+        Sell your produce directly to buyers
+        through Farmora.
+    </p>
+
+</section>
+
+
+<main class="container">
+
+
+<!-- =====================================================
+     VOICE ASSISTANT
+====================================================== -->
+
+<section class="voice-box">
+
+    <h2>
+        🎤 Add Produce Using Your Voice
+    </h2>
+
+    <p>
+        Speak naturally, for example:
+        "I have 50 kilos of tomatoes and I want
+        to sell them for 40 rupees per kilo."
+    </p>
+
+
+    <div class="voice-row">
+
+        <select
+            id="languageSelect"
+            class="language-select"
+        >
+
+            <option value="en-IN">
+                English
+            </option>
+
+            <option value="te-IN">
+                తెలుగు (Telugu)
+            </option>
+
+            <option value="hi-IN">
+                हिंदी (Hindi)
+            </option>
+
+            <option value="ta-IN">
+                தமிழ் (Tamil)
+            </option>
+
+            <option value="kn-IN">
+                ಕನ್ನಡ (Kannada)
+            </option>
+
+            <option value="ml-IN">
+                മലയാളം (Malayalam)
+            </option>
+
+            <option value="mr-IN">
+                मराठी (Marathi)
+            </option>
+
+            <option value="bn-IN">
+                বাংলা (Bengali)
+            </option>
+
+            <option value="gu-IN">
+                ગુજરાતી (Gujarati)
+            </option>
+
+            <option value="pa-IN">
+                ਪੰਜਾਬੀ (Punjabi)
+            </option>
+
+            <option value="ur-IN">
+                اردو (Urdu)
+            </option>
+
+            <option value="as-IN">
+                অসমীয়া (Assamese)
+            </option>
+
+            <option value="or-IN">
+                ଓଡ଼ିଆ (Odia)
+            </option>
+
+        </select>
+
+
+        <button
+            id="micButton"
+            class="mic-btn"
+            onclick="startVoiceRecognition()"
+        >
+            🎤
+        </button>
+
+    </div>
+
+
+    <div
+        id="transcript"
+        class="transcript"
+    >
+        Your voice input will appear here...
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     ADD PRODUCE
+====================================================== -->
+
+<section class="card">
+
+    <h2>
+        🌱 Add Your Produce
+    </h2>
+
+
+    <div class="form-grid">
+
+
+        <div class="form-group">
+
+            <label>
+                Produce Name *
+            </label>
+
+            <input
+                type="text"
+                id="produceName"
+                placeholder="Example: Tomatoes"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Category *
+            </label>
+
+            <select id="category">
+
+                <option value="">
+                    Select Category
+                </option>
+
+                <option value="Vegetables">
+                    Vegetables
+                </option>
+
+                <option value="Fruits">
+                    Fruits
+                </option>
+
+                <option value="Rice">
+                    Rice
+                </option>
+
+                <option value="Grains">
+                    Grains
+                </option>
+
+                <option value="Pulses">
+                    Pulses
+                </option>
+
+                <option value="Flowers">
+                    Flowers
+                </option>
+
+                <option value="Fish & Aquaculture">
+                    Fish & Aquaculture
+                </option>
+
+                <option value="Dairy">
+                    Dairy
+                </option>
+
+                <option value="Poultry & Eggs">
+                    Poultry & Eggs
+                </option>
+
+                <option value="Honey">
+                    Honey
+                </option>
+
+                <option value="Plants/Nursery">
+                    Plants / Nursery
+                </option>
+
+                <option value="Nuts & Seeds">
+                    Nuts & Seeds
+                </option>
+
+                <option value="Other">
+                    Other
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Quantity *
+            </label>
+
+            <input
+                type="number"
+                id="quantity"
+                placeholder="Example: 50"
+                min="0"
+                step="0.01"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Unit *
+            </label>
+
+            <select id="unit">
+
+                <option value="">
+                    Select Unit
+                </option>
+
+                <option value="kg">
+                    Kilogram (kg)
+                </option>
+
+                <option value="quintal">
+                    Quintal
+                </option>
+
+                <option value="ton">
+                    Ton
+                </option>
+
+                <option value="litre">
+                    Litre
+                </option>
+
+                <option value="piece">
+                    Piece
+                </option>
+
+                <option value="dozen">
+                    Dozen
+                </option>
+
+                <option value="box">
+                    Box
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Price per Unit (₹) *
+            </label>
+
+            <input
+                type="number"
+                id="price"
+                placeholder="Example: 40"
+                min="0"
+                step="0.01"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Location *
+            </label>
+
+            <input
+                type="text"
+                id="location"
+                placeholder="Example: Hyderabad"
+            >
+
+        </div>
+
+
+        <div class="form-group full-width">
+
+            <label>
+                Quality
+            </label>
+
+            <select id="quality">
+
+                <option value="Excellent">
+                    Excellent
+                </option>
+
+                <option value="Good" selected>
+                    Good
+                </option>
+
+                <option value="Average">
+                    Average
+                </option>
+
+            </select>
+
+        </div>
+
+
+    </div>
+
+
+    <button
+        class="add-btn"
+        onclick="addProduceToDatabase()"
+    >
+        ➕ Add Produce
+    </button>
+
+</section>
+
+
+
+<!-- =====================================================
+     MY PRODUCTS
+====================================================== -->
+
+<section class="card">
+
+    <h2>
+        🌾 My Listed Produce
+    </h2>
+
+
+    <div
+        id="productList"
+        class="product-grid"
+    >
+
+        <div class="loading">
+            Loading your products...
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     INCOMING ORDERS
+====================================================== -->
+
+<section class="card">
+
+    <h2>
+        📦 Incoming Orders
+    </h2>
+
+
+    <div
+        id="farmerOrders"
+        class="orders-container"
+    >
+
+        <div class="loading">
+            Loading orders...
+        </div>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+
+<script>
+
+/* =====================================================
+   API SERVER
+====================================================== */
+
+const SERVER =
+    "http://localhost:5000";
+
+
+/* =====================================================
+   ADD PRODUCE TO MYSQL
+====================================================== */
+
+async function addProduceToDatabase() {
+
+    const name =
+        document.getElementById(
+            "produceName"
+        ).value.trim();
+
+
+    const category =
+        document.getElementById(
+            "category"
+        ).value;
+
+
+    const quantity =
+        document.getElementById(
+            "quantity"
+        ).value;
+
+
+    const unit =
+        document.getElementById(
+            "unit"
+        ).value;
+
+
+    const price =
+        document.getElementById(
+            "price"
+        ).value;
+
+
+    const location =
+        document.getElementById(
+            "location"
+        ).value.trim();
+
+
+    const quality =
+        document.getElementById(
+            "quality"
+        ).value;
+
+
+    /* VALIDATION */
+
+    if (
+        !name ||
+        !category ||
+        !quantity ||
+        !unit ||
+        !price ||
+        !location
+    ) {
+
+        alert(
+            "Please fill all required fields."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${SERVER}/api/products`,
+                {
+
+                    method: "POST",
+
+                    credentials: "include",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        name:
+                            name,
+
+                        category:
+                            category,
+
+                        quantity:
+                            Number(quantity),
+
+                        unit:
+                            unit,
+
+                        price:
+                            Number(price),
+
+                        location:
+                            location,
+
+                        quality:
+                            quality
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Failed to add produce."
+            );
+
+        }
+
+
+        alert(
+            "✅ Produce added successfully!"
+        );
+
+
+        /* CLEAR FORM */
+
+        document.getElementById(
+            "produceName"
+        ).value = "";
+
+
+        document.getElementById(
+            "category"
+        ).value = "";
+
+
+        document.getElementById(
+            "quantity"
+        ).value = "";
+
+
+        document.getElementById(
+            "unit"
+        ).value = "";
+
+
+        document.getElementById(
+            "price"
+        ).value = "";
+
+
+        document.getElementById(
+            "location"
+        ).value = "";
+
+
+        document.getElementById(
+            "quality"
+        ).value = "Good";
+
+
+        /* RELOAD PRODUCTS */
+
+        loadFarmerProducts();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Add produce error:",
+            error
+        );
+
+        alert(
+            "❌ " + error.message
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   LOAD FARMER PRODUCTS
+====================================================== */
+
+async function loadFarmerProducts() {
+
+    const productList =
+        document.getElementById(
+            "productList"
+        );
+
+
+    try {
+
+        /* GET CURRENT USER */
+
+        const userResponse =
+            await fetch(
+                `${SERVER}/api/me`,
+                {
+                    credentials: "include"
+                }
+            );
+
+
+        const userData =
+            await userResponse.json();
+
+
+        if (
+            !userResponse.ok ||
+            !userData.user
+        ) {
+
+            window.location.href =
+                "login.html";
+
+            return;
+
+        }
+
+
+        const farmerId =
+            Number(
+                userData.user.id
+            );
+
+
+        /* GET PRODUCTS */
+
+        const response =
+            await fetch(
+                `${SERVER}/api/products`
+            );
+
+
+        const products =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load products."
+            );
+
+        }
+
+
+        /* ONLY THIS FARMER'S PRODUCTS */
+
+        const myProducts =
+            products.filter(
+                product =>
+                    Number(
+                        product.farmer_id
+                    ) === farmerId
+            );
+
+
+        if (
+            myProducts.length === 0
+        ) {
+
+            productList.innerHTML = `
+
+                <div class="empty">
+
+                    🌱 You haven't listed
+                    any produce yet.
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        productList.innerHTML =
+            myProducts.map(
+                product => `
+
+                <div class="product-card">
+
+                    <div class="product-icon">
+
+                        ${getProductIcon(
+                            product.category
+                        )}
+
+                    </div>
+
+
+                    <h3>
+
+                        ${escapeHTML(
+                            product.name
+                        )}
+
+                    </h3>
+
+
+                    <p>
+
+                        📂
+                        <strong>Category:</strong>
+                        ${escapeHTML(
+                            product.category
+                        )}
+
+                    </p>
+
+
+                    <p>
+
+                        📦
+                        <strong>Available:</strong>
+                        ${product.quantity}
+                        ${escapeHTML(
+                            product.unit
+                        )}
+
+                    </p>
+
+
+                    <p>
+
+                        📍
+                        <strong>Location:</strong>
+                        ${escapeHTML(
+                            product.location
+                        )}
+
+                    </p>
+
+
+                    <p>
+
+                        ⭐
+                        <strong>Quality:</strong>
+                        ${escapeHTML(
+                            product.quality ||
+                            "Good"
+                        )}
+
+                    </p>
+
+
+                    <div class="product-price">
+
+                        ₹${Number(
+                            product.price
+                        ).toFixed(2)}
+
+                        /
+                        ${escapeHTML(
+                            product.unit
+                        )}
+
+                    </div>
+
+                </div>
+
+            `
+            ).join("");
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Products error:",
+            error
+        );
+
+
+        productList.innerHTML = `
+
+            <div class="empty">
+
+                ❌ Unable to load your products.
+
+                <br><br>
+
+                ${escapeHTML(
+                    error.message
+                )}
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =====================================================
+   PRODUCT ICON
+====================================================== */
+
+function getProductIcon(category) {
+
+    const icons = {
+
+        "Vegetables": "🥕",
+
+        "Fruits": "🍎",
+
+        "Rice": "🍚",
+
+        "Grains": "🌾",
+
+        "Pulses": "🫘",
+
+        "Flowers": "🌸",
+
+        "Fish & Aquaculture": "🐟",
+
+        "Dairy": "🥛",
+
+        "Poultry & Eggs": "🥚",
+
+        "Honey": "🍯",
+
+        "Plants/Nursery": "🌱",
+
+        "Nuts & Seeds": "🌰",
+
+        "Other": "📦"
+
+    };
+
+
+    return icons[category] ||
+           "🌱";
+
+}
+
+
+/* =====================================================
+   LOAD FARMER ORDERS FROM MYSQL
+====================================================== */
+
+async function loadFarmerOrders() {
+
+    const ordersContainer =
+        document.getElementById(
+            "farmerOrders"
+        );
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${SERVER}/api/farmer/orders`,
+                {
+                    credentials: "include"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Failed to load orders."
+            );
+
+        }
+
+
+        console.log(
+            "✅ Farmer orders:",
+            data
+        );
+
+
+        if (data.length === 0) {
+
+            ordersContainer.innerHTML = `
+
+                <div class="empty">
+
+                    📦 No orders received yet.
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        ordersContainer.innerHTML =
+            data.map(
+                order => `
+
+                <div class="order-card">
+
+
+                    <div class="order-header">
+
+                        <h3>
+
+                            📦 Order #${order.id}
+
+                        </h3>
+
+
+                        <span
+                            class="status-badge"
+                        >
+
+                            ${escapeHTML(
+                                order.status
+                            )}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="order-details">
+
+                        <p>
+
+                            🌱
+                            <strong>Product:</strong>
+
+                            ${escapeHTML(
+                                order.product_name
+                            )}
+
+                        </p>
+
+
+                        <p>
+
+                            📦
+                            <strong>Quantity:</strong>
+
+                            ${order.quantity}
+
+                            ${escapeHTML(
+                                order.unit
+                            )}
+
+                        </p>
+
+
+                        <p>
+
+                            💰
+                            <strong>Price:</strong>
+
+                            ₹${Number(
+                                order.price
+                            ).toFixed(2)}
+
+                        </p>
+
+
+                        <p>
+
+                            💵
+                            <strong>Total:</strong>
+
+                            ₹${Number(
+                                order.total
+                            ).toFixed(2)}
+
+                        </p>
+
+
+                        <hr>
+
+
+                        <p>
+
+                            👤
+                            <strong>Buyer:</strong>
+
+                            ${escapeHTML(
+                                order.buyer_name
+                            )}
+
+                        </p>
+
+
+                        <p>
+
+                            📞
+                            <strong>Phone:</strong>
+
+                            ${escapeHTML(
+                                order.buyer_phone
+                            )}
+
+                        </p>
+
+
+                        <p>
+
+                            📍
+                            <strong>Delivery Address:</strong>
+
+                            ${escapeHTML(
+                                order.delivery_address
+                            )}
+
+                        </p>
+
+
+                        <p>
+
+                            🕒
+                            <strong>Order Date:</strong>
+
+                            ${new Date(
+                                order.created_at
+                            ).toLocaleString()}
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="order-actions">
+
+                        ${getOrderButtons(
+                            order
+                        )}
+
+                    </div>
+
+
+                </div>
+
+            `
+            ).join("");
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Farmer orders error:",
+            error
+        );
+
+
+        ordersContainer.innerHTML = `
+
+            <div class="empty">
+
+                ❌ Unable to load orders.
+
+                <br><br>
+
+                ${escapeHTML(
+                    error.message
+                )}
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =====================================================
+   ORDER BUTTONS
+====================================================== */
+
+function getOrderButtons(order) {
+
+
+    if (
+        order.status ===
+        "New Order"
+    ) {
+
+        return `
+
+            <button
+                class="accept-btn"
+                onclick="
+                    updateOrderStatus(
+                        ${order.id},
+                        'Accepted'
+                    )
+                "
+            >
+
+                ✅ Accept Order
+
+            </button>
+
+
+            <button
+                class="reject-btn"
+                onclick="
+                    updateOrderStatus(
+                        ${order.id},
+                        'Rejected'
+                    )
+                "
+            >
+
+                ❌ Reject
+
+            </button>
+
+        `;
+
+    }
+
+
+    if (
+        order.status ===
+        "Accepted"
+    ) {
+
+        return `
+
+            <button
+                class="accept-btn"
+                onclick="
+                    updateOrderStatus(
+                        ${order.id},
+                        'Preparing'
+                    )
+                "
+            >
+
+                👨‍🌾 Start Preparing
+
+            </button>
+
+        `;
+
+    }
+
+
+    if (
+        order.status ===
+        "Preparing"
+    ) {
+
+        return `
+
+            <button
+                class="accept-btn"
+                onclick="
+                    updateOrderStatus(
+                        ${order.id},
+                        'Ready for Pickup'
+                    )
+                "
+            >
+
+                📦 Ready for Pickup
+
+            </button>
+
+        `;
+
+    }
+
+
+    if (
+        order.status ===
+        "Ready for Pickup"
+    ) {
+
+        return `
+
+            <button
+                class="accept-btn"
+                onclick="
+                    updateOrderStatus(
+                        ${order.id},
+                        'Picked Up'
+                    )
+                "
+            >
+
+                🚚 Mark Picked Up
+
+            </button>
+
+        `;
+
+    }
+
+
+    if (
+        order.status ===
+        "Picked Up"
+    ) {
+
+        return `
+
+            <button
+                class="accept-btn"
+                onclick="
+                    updateOrderStatus(
+                        ${order.id},
+                        'In Transit'
+                    )
+                "
+            >
+
+                🚚 Start Delivery
+
+            </button>
+
+        `;
+
+    }
+
+
+    if (
+        order.status ===
+        "In Transit"
+    ) {
+
+        return `
+
+            <button
+                class="accept-btn"
+                onclick="
+                    updateOrderStatus(
+                        ${order.id},
+                        'Delivered'
+                    )
+                "
+            >
+
+                📍 Mark Delivered
+
+            </button>
+
+        `;
+
+    }
+
+
+    if (
+        order.status ===
+        "Delivered"
+    ) {
+
+        return `
+
+            <strong>
+
+                ✅ Order Completed
+
+            </strong>
+
+        `;
+
+    }
+
+
+    if (
+        order.status ===
+        "Rejected"
+    ) {
+
+        return `
+
+            <strong>
+
+                ❌ Order Rejected
+
+            </strong>
+
+        `;
+
+    }
+
+
+    return "";
+
+}
+
+
+/* =====================================================
+   UPDATE ORDER STATUS
+====================================================== */
+
+async function updateOrderStatus(
+    orderId,
+    status
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                `${SERVER}/api/orders/${orderId}/status`,
+                {
+
+                    method: "PATCH",
+
+                    credentials: "include",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        status: status
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Failed to update order."
+            );
+
+        }
+
+
+        console.log(
+            `✅ Order ${orderId} → ${status}`
+        );
+
+
+        alert(
+            `✅ Order #${orderId} updated to ${status}`
+        );
+
+
+        /* RELOAD FROM MYSQL */
+
+        loadFarmerOrders();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Status update error:",
+            error
+        );
+
+
+        alert(
+            "❌ " + error.message
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   VOICE RECOGNITION
+====================================================== */
+
+let recognition = null;
+
+
+function startVoiceRecognition() {
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+
+    if (!SpeechRecognition) {
+
+        alert(
+            "Voice recognition is not supported in this browser. Please use Google Chrome."
+        );
+
+        return;
+
+    }
+
+
+    recognition =
+        new SpeechRecognition();
+
+
+    recognition.lang =
+        document.getElementById(
+            "languageSelect"
+        ).value;
+
+
+    recognition.interimResults =
+        false;
+
+
+    recognition.continuous =
+        false;
+
+
+    recognition.onstart =
+        function () {
+
+            document.getElementById(
+                "micButton"
+            ).innerText = "🔴";
+
+
+            document.getElementById(
+                "transcript"
+            ).innerText =
+                "Listening...";
+
+        };
+
+
+    recognition.onresult =
+        function (event) {
+
+            const text =
+                event.results[0][0]
+                    .transcript;
+
+
+            document.getElementById(
+                "transcript"
+            ).innerText =
+                text;
+
+
+            parseVoiceInput(text);
+
+        };
+
+
+    recognition.onerror =
+        function (event) {
+
+            console.error(
+                "Voice error:",
+                event.error
+            );
+
+
+            document.getElementById(
+                "transcript"
+            ).innerText =
+                "❌ Voice recognition error: " +
+                event.error;
+
+        };
+
+
+    recognition.onend =
+        function () {
+
+            document.getElementById(
+                "micButton"
+            ).innerText = "🎤";
+
+        };
+
+
+    recognition.start();
+
+}
+
+
+/* =====================================================
+   VOICE PARSER
+====================================================== */
+
+function parseVoiceInput(text) {
+
+    const lower =
+        text.toLowerCase();
+
+
+    /*
+       PRODUCT
+    */
+
+    const products = [
+
+        "tomatoes",
+        "tomato",
+        "potatoes",
+        "potato",
+        "onions",
+        "onion",
+        "rice",
+        "wheat",
+        "maize",
+        "corn",
+        "carrot",
+        "mango",
+        "mangoes",
+        "banana",
+        "bananas",
+        "apples",
+        "apple",
+        "pulses"
+
+    ];
+
+
+    for (
+        const product of products
+    ) {
+
+        if (
+            lower.includes(product)
+        ) {
+
+            document.getElementById(
+                "produceName"
+            ).value =
+                product;
+
+            break;
+
+        }
+
+    }
+
+
+    /*
+       QUANTITY
+    */
+
+    const quantityMatch =
+        lower.match(
+            /(\d+(?:\.\d+)?)\s*(kg|kilos|kilograms|quintal|quintals|ton|tons|litre|litres|liters|piece|pieces|dozen|box|boxes)/
+        );
+
+
+    if (quantityMatch) {
+
+        document.getElementById(
+            "quantity"
+        ).value =
+            quantityMatch[1];
+
+
+        const voiceUnit =
+            quantityMatch[2];
+
+
+        let unit = "";
+
+
+        if (
+            voiceUnit.includes("kg") ||
+            voiceUnit.includes("kilo")
+        ) {
+
+            unit = "kg";
+
+        }
+        else if (
+            voiceUnit.includes("quintal")
+        ) {
+
+            unit = "quintal";
+
+        }
+        else if (
+            voiceUnit.includes("ton")
+        ) {
+
+            unit = "ton";
+
+        }
+        else if (
+            voiceUnit.includes("lit")
+        ) {
+
+            unit = "litre";
+
+        }
+        else if (
+            voiceUnit.includes("piece")
+        ) {
+
+            unit = "piece";
+
+        }
+        else if (
+            voiceUnit.includes("dozen")
+        ) {
+
+            unit = "dozen";
+
+        }
+        else if (
+            voiceUnit.includes("box")
+        ) {
+
+            unit = "box";
+
+        }
+
+
+        document.getElementById(
+            "unit"
+        ).value =
+            unit;
+
+    }
+
+
+    /*
+       PRICE
+    */
+
+    const priceMatch =
+        lower.match(
+            /(?:for|at|price|rupees|₹)\s*(?:rs\.?|rupees?)?\s*(\d+(?:\.\d+)?)/
+        );
+
+
+    if (priceMatch) {
+
+        document.getElementById(
+            "price"
+        ).value =
+            priceMatch[1];
+
+    }
+
+
+    /*
+       LOCATION
+    */
+
+    const locationMatch =
+        text.match(
+            /(?:in|at|from)\s+([A-Za-z\s]+?)(?:\s+and|\s+for|\s+at|$)/i
+        );
+
+
+    if (locationMatch) {
+
+        document.getElementById(
+            "location"
+        ).value =
+            locationMatch[1].trim();
+
+    }
+
+
+    /*
+       QUALITY
+    */
+
+    if (
+        lower.includes("excellent")
+    ) {
+
+        document.getElementById(
+            "quality"
+        ).value =
+            "Excellent";
+
+    }
+    else if (
+        lower.includes("average")
+    ) {
+
+        document.getElementById(
+            "quality"
+        ).value =
+            "Average";
+
+    }
+    else if (
+        lower.includes("good") ||
+        lower.includes("fresh")
+    ) {
+
+        document.getElementById(
+            "quality"
+        ).value =
+            "Good";
+
+    }
+
+
+    /*
+       CATEGORY
+    */
+
+    if (
+        lower.includes("tomato") ||
+        lower.includes("potato") ||
+        lower.includes("onion") ||
+        lower.includes("carrot")
+    ) {
+
+        document.getElementById(
+            "category"
+        ).value =
+            "Vegetables";
+
+    }
+
+    else if (
+        lower.includes("mango") ||
+        lower.includes("banana") ||
+        lower.includes("apple")
+    ) {
+
+        document.getElementById(
+            "category"
+        ).value =
+            "Fruits";
+
+    }
+
+    else if (
+        lower.includes("rice")
+    ) {
+
+        document.getElementById(
+            "category"
+        ).value =
+            "Rice";
+
+    }
+
+    else if (
+        lower.includes("wheat") ||
+        lower.includes("maize") ||
+        lower.includes("corn")
+    ) {
+
+        document.getElementById(
+            "category"
+        ).value =
+            "Grains";
+
+    }
+
+    else if (
+        lower.includes("pulse")
+    ) {
+
+        document.getElementById(
+            "category"
+        ).value =
+            "Pulses";
+
+    }
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+====================================================== */
+
+function escapeHTML(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =====================================================
+   LOGOUT
+====================================================== */
+
+async function logout() {
+
+    try {
+
+        await fetch(
+            `${SERVER}/api/logout`,
+            {
+                method: "POST",
+                credentials: "include"
+            }
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+    }
+
+
+    localStorage.removeItem(
+        "farmoraCurrentUser"
+    );
+
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+/* =====================================================
+   INITIAL LOAD
+====================================================== */
+
+loadFarmerProducts();
+
+loadFarmerOrders();
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Farmora - Buyer Marketplace</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f8f3;
+            color: #18351f;
+        }
+
+        /* NAVBAR */
+
+        nav {
+            background: #123524;
+            color: white;
+            padding: 15px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #9ccc65;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav-links a,
+        .logout-btn {
+            color: white;
+            text-decoration: none;
+            padding: 9px 15px;
+            border-radius: 7px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .nav-links a:hover {
+            background: #2e7d32;
+        }
+
+        .logout-btn {
+            background: #c62828;
+        }
+
+        /* HERO */
+
+        .hero {
+            background: linear-gradient(
+                135deg,
+                #123524,
+                #2e7d32
+            );
+
+            color: white;
+            padding: 55px 7%;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            font-size: 18px;
+        }
+
+        /* CONTAINER */
+
+        .container {
+            width: 90%;
+            max-width: 1250px;
+            margin: 35px auto;
+        }
+
+        /* SEARCH */
+
+        .search-box {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .search-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #2e7d32;
+        }
+
+        /* CATEGORIES */
+
+        .categories {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px 0 20px;
+        }
+
+        .category-btn {
+            border: none;
+            background: white;
+            padding: 11px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: #2e7d32;
+            color: white;
+        }
+
+        /* PRODUCTS */
+
+        .section-title {
+            font-size: 28px;
+            margin: 20px 0;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .product-top {
+            padding: 22px;
+        }
+
+        .product-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .product-card h3 {
+            color: #2e7d32;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .verified {
+            display: inline-block;
+            background: #eaf6ea;
+            color: #2e7d32;
+            padding: 5px 9px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .product-info {
+            line-height: 1.7;
+            color: #555;
+        }
+
+        .price {
+            color: #123524;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .cart-btn {
+            width: 100%;
+            border: none;
+            background: #2e7d32;
+            color: white;
+            padding: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .cart-btn:hover {
+            background: #1b5e20;
+        }
+
+        .empty {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            color: #777;
+        }
+
+        /* CART */
+
+        .cart-box {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 330px;
+            max-height: 70vh;
+            overflow-y: auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            padding: 20px;
+            z-index: 2000;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .cart-item {
+            border-bottom: 1px solid #eee;
+            padding: 12px 0;
+        }
+
+        .remove-btn {
+            margin-top: 7px;
+            border: none;
+            color: #c62828;
+            background: none;
+            cursor: pointer;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 13px;
+            background: #e9a83b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .total {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        /* MODAL */
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+        }
+
+        .modal-content input {
+            margin-bottom: 15px;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            padding: 13px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            width: 100%;
+            padding: 11px;
+            margin-top: 10px;
+            background: #ddd;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 900px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .search-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-box {
+                width: calc(100% - 30px);
+                right: 15px;
+                bottom: 15px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     BUYER ROLE PROTECTION
+====================================================== -->
+
+<script>
+
+(async function checkBuyerLogin() {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:5000/api/me",
+            {
+                credentials: "include"
+            }
+        );
+
+        if (!response.ok) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        const data = await response.json();
+
+        if (
+            !data.user ||
+            data.user.role !== "buyer"
+        ) {
+
+            alert(
+                "This page is only available for Buyer accounts."
+            );
+
+            window.location.href = "farmer.html";
+
+            return;
+        }
+
+        console.log(
+            "✅ Buyer authenticated:",
+            data.user.name
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Authentication error:",
+            error
+        );
+
+        window.location.href = "login.html";
+
+    }
+
+})();
+
+</script>
+
+
+<!-- NAVBAR -->
+
+<nav>
+
+    <div class="logo">
+        🌱 Farm<span>ora</span>
+    </div>
+
+    <div class="nav-links">
+
+        <a href="index.html">
+            Home
+        </a>
+
+        <a href="farmer.html">
+            🚜 Sell Produce
+        </a>
+
+        <a href="#products">
+            🛒 Marketplace
+        </a>
+
+        <button
+            class="logout-btn"
+            onclick="logout()"
+        >
+            Logout
+        </button>
+
+    </div>
+
+</nav>
+
+
+<!-- HERO -->
+
+<section class="hero">
+
+    <h1>
+        Fresh Produce Direct From Farmers 🥕
+    </h1>
+
+    <p>
+        Buy quality agricultural products directly
+        from verified farmers through Farmora.
+    </p>
+
+</section>
+
+
+<main class="container">
+
+
+    <!-- SEARCH -->
+
+    <section class="search-box">
+
+        <div class="search-row">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="🔍 Search tomatoes, rice, mangoes..."
+            >
+
+            <input
+                type="text"
+                id="locationInput"
+                placeholder="📍 Location"
+            >
+
+            <select id="categoryFilter">
+
+                <option value="">
+                    All Categories
+                </option>
+
+                <option value="Vegetables">
+                    Vegetables
+                </option>
+
+                <option value="Fruits">
+                    Fruits
+                </option>
+
+                <option value="Rice">
+                    Rice
+                </option>
+
+                <option value="Grains">
+                    Grains
+                </option>
+
+                <option value="Pulses">
+                    Pulses
+                </option>
+
+                <option value="Flowers">
+                    Flowers
+                </option>
+
+                <option value="Fish & Aquaculture">
+                    Fish & Aquaculture
+                </option>
+
+                <option value="Dairy">
+                    Dairy
+                </option>
+
+                <option value="Poultry & Eggs">
+                    Poultry & Eggs
+                </option>
+
+                <option value="Honey">
+                    Honey
+                </option>
+
+                <option value="Plants/Nursery">
+                    Plants / Nursery
+                </option>
+
+                <option value="Nuts & Seeds">
+                    Nuts & Seeds
+                </option>
+
+                <option value="Other">
+                    Other
+                </option>
+
+            </select>
+
+        </div>
+
+    </section>
+
+
+    <!-- CATEGORY BUTTONS -->
+
+    <div class="categories">
+
+        <button
+            class="category-btn active"
+            onclick="selectCategory('')"
+        >
+            All
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="selectCategory('Vegetables')"
+        >
+            🥕 Vegetables
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="selectCategory('Fruits')"
+        >
+            🍎 Fruits
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="selectCategory('Rice')"
+        >
+            🍚 Rice
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="selectCategory('Grains')"
+        >
+            🌾 Grains
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="selectCategory('Pulses')"
+        >
+            🫘 Pulses
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="selectCategory('Flowers')"
+        >
+            🌸 Flowers
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="selectCategory('Dairy')"
+        >
+            🥛 Dairy
+        </button>
+
+    </div>
+
+
+    <!-- PRODUCTS -->
+
+    <section id="products">
+
+        <h2 class="section-title">
+            🌱 Produce Available Near You
+        </h2>
+
+        <div
+            id="productGrid"
+            class="product-grid"
+        >
+
+            <div class="empty">
+                Loading products...
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- CART -->
+
+<div class="cart-box">
+
+    <div class="cart-header">
+
+        <h2>
+            🛒 Cart
+        </h2>
+
+        <strong id="cartCount">
+            0
+        </strong>
+
+    </div>
+
+    <div id="cartItems">
+
+        <p>
+            Your cart is empty.
+        </p>
+
+    </div>
+
+    <div
+        id="cartTotal"
+        class="total"
+    >
+        Total: ₹0
+    </div>
+
+    <button
+        class="checkout-btn"
+        onclick="openCheckout()"
+    >
+        Proceed to Checkout
+    </button>
+
+</div>
+
+
+<!-- CHECKOUT MODAL -->
+
+<div
+    id="checkoutModal"
+    class="modal"
+>
+
+    <div class="modal-content">
+
+        <h2>
+            📦 Checkout
+        </h2>
+
+        <input
+            type="text"
+            id="buyerName"
+            placeholder="Your Name"
+        >
+
+        <input
+            type="tel"
+            id="buyerPhone"
+            placeholder="Phone Number"
+        >
+
+        <input
+            type="text"
+            id="buyerAddress"
+            placeholder="Delivery Address"
+        >
+
+        <button
+            class="confirm-btn"
+            onclick="placeOrder()"
+        >
+            Confirm Order
+        </button>
+
+        <button
+            class="close-btn"
+            onclick="closeCheckout()"
+        >
+            Cancel
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   GLOBAL PRODUCTS
+====================================================== */
+
+let products = [];
+
+let cart = JSON.parse(
+    localStorage.getItem("farmoraCart")
+) || [];
+
+
+/* =====================================================
+   LOAD PRODUCTS FROM MYSQL
+====================================================== */
+
+async function loadProducts() {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:5000/api/products"
+        );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load products"
+            );
+
+        }
+
+        products = await response.json();
+
+        console.log(
+            "✅ Products loaded from MySQL:",
+            products
+        );
+
+        displayProducts();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Product loading error:",
+            error
+        );
+
+        document.getElementById(
+            "productGrid"
+        ).innerHTML = `
+
+            <div class="empty">
+
+                ❌ Unable to load products.
+                Please make sure Farmora server
+                is running.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =====================================================
+   DISPLAY PRODUCTS
+====================================================== */
+
+function displayProducts() {
+
+    const grid =
+        document.getElementById(
+            "productGrid"
+        );
+
+
+    const search =
+        document.getElementById(
+            "searchInput"
+        ).value
+        .toLowerCase()
+        .trim();
+
+
+    const location =
+        document.getElementById(
+            "locationInput"
+        ).value
+        .toLowerCase()
+        .trim();
+
+
+    const category =
+        document.getElementById(
+            "categoryFilter"
+        ).value;
+
+
+    const filtered =
+        products.filter(product => {
+
+            const matchesSearch =
+                !search ||
+                product.name
+                    .toLowerCase()
+                    .includes(search) ||
+                product.category
+                    .toLowerCase()
+                    .includes(search) ||
+                product.farmer_name
+                    .toLowerCase()
+                    .includes(search);
+
+
+            const matchesLocation =
+                !location ||
+                product.location
+                    .toLowerCase()
+                    .includes(location);
+
+
+            const matchesCategory =
+                !category ||
+                product.category === category;
+
+
+            return (
+                matchesSearch &&
+                matchesLocation &&
+                matchesCategory
+            );
+
+        });
+
+
+    if (filtered.length === 0) {
+
+        grid.innerHTML = `
+
+            <div class="empty">
+
+                🌱 No produce found
+                matching your search.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    grid.innerHTML =
+        filtered.map(product => `
+
+        <div class="product-card">
+
+            <div class="product-top">
+
+                <div class="product-icon">
+
+                    ${getProductIcon(
+                        product.category
+                    )}
+
+                </div>
+
+                <span class="verified">
+                    ✓ Verified Farmer
+                </span>
+
+                <h3>
+                    ${escapeHTML(
+                        product.name
+                    )}
+                </h3>
+
+                <div class="product-info">
+
+                    👨‍🌾
+                    <strong>Farmer:</strong>
+                    ${escapeHTML(
+                        product.farmer_name
+                    )}
+
+                    <br>
+
+                    📍
+                    <strong>Location:</strong>
+                    ${escapeHTML(
+                        product.location
+                    )}
+
+                    <br>
+
+                    📦
+                    <strong>Available:</strong>
+                    ${product.quantity}
+                    ${escapeHTML(
+                        product.unit
+                    )}
+
+                    <br>
+
+                    ⭐
+                    <strong>Quality:</strong>
+                    ${escapeHTML(
+                        product.quality ||
+                        "Good"
+                    )}
+
+                </div>
+
+                <div class="price">
+
+                    ₹${product.price}
+
+                    <span style="
+                        font-size:14px;
+                        font-weight:normal;
+                    ">
+                        / ${escapeHTML(
+                            product.unit
+                        )}
+                    </span>
+
+                </div>
+
+                <button
+                    class="cart-btn"
+                    onclick="addToCart(${product.id})"
+                >
+                    🛒 Add to Cart
+                </button>
+
+            </div>
+
+        </div>
+
+    `).join("");
+
+}
+
+
+/* =====================================================
+   PRODUCT ICON
+====================================================== */
+
+function getProductIcon(category) {
+
+    const icons = {
+
+        "Vegetables": "🥕",
+        "Fruits": "🍎",
+        "Rice": "🍚",
+        "Grains": "🌾",
+        "Pulses": "🫘",
+        "Flowers": "🌸",
+        "Fish & Aquaculture": "🐟",
+        "Dairy": "🥛",
+        "Poultry & Eggs": "🥚",
+        "Honey": "🍯",
+        "Plants/Nursery": "🌱",
+        "Nuts & Seeds": "🌰",
+        "Other": "📦"
+
+    };
+
+    return icons[category] || "🌱";
+
+}
+
+
+/* =====================================================
+   ADD TO CART
+====================================================== */
+
+function addToCart(productId) {
+
+    const product =
+        products.find(
+            p => Number(p.id) ===
+                 Number(productId)
+        );
+
+
+    if (!product) {
+
+        alert(
+            "Product not found."
+        );
+
+        return;
+
+    }
+
+
+    const existing =
+        cart.find(
+            item =>
+                Number(item.id) ===
+                Number(product.id)
+        );
+
+
+    if (existing) {
+
+        existing.quantity += 1;
+
+    }
+
+    else {
+
+        cart.push({
+
+            id: product.id,
+
+            productName:
+                product.name,
+
+            price:
+                Number(product.price),
+
+            quantity: 1,
+
+            unit:
+                product.unit,
+
+            farmer:
+                product.farmer_name,
+
+            location:
+                product.location
+
+        });
+
+    }
+
+
+    saveCart();
+
+    updateCart();
+
+    alert(
+        "✅ Added to cart!"
+    );
+
+}
+
+
+/* =====================================================
+   SAVE CART
+====================================================== */
+
+function saveCart() {
+
+    localStorage.setItem(
+        "farmoraCart",
+        JSON.stringify(cart)
+    );
+
+}
+
+
+/* =====================================================
+   UPDATE CART
+====================================================== */
+
+function updateCart() {
+
+    const cartItems =
+        document.getElementById(
+            "cartItems"
+        );
+
+
+    const cartCount =
+        document.getElementById(
+            "cartCount"
+        );
+
+
+    const cartTotal =
+        document.getElementById(
+            "cartTotal"
+        );
+
+
+    cartCount.innerText =
+        cart.reduce(
+            (sum, item) =>
+                sum + item.quantity,
+            0
+        );
+
+
+    if (cart.length === 0) {
+
+        cartItems.innerHTML =
+            "<p>Your cart is empty.</p>";
+
+        cartTotal.innerText =
+            "Total: ₹0";
+
+        return;
+
+    }
+
+
+    let total = 0;
+
+
+    cartItems.innerHTML =
+        cart.map((item, index) => {
+
+            const itemTotal =
+                item.price *
+                item.quantity;
+
+            total += itemTotal;
+
+
+            return `
+
+                <div class="cart-item">
+
+                    <strong>
+                        ${escapeHTML(
+                            item.productName
+                        )}
+                    </strong>
+
+                    <br>
+
+                    ₹${item.price}
+                    ×
+                    ${item.quantity}
+
+                    <br>
+
+                    <small>
+                        Farmer:
+                        ${escapeHTML(
+                            item.farmer
+                        )}
+                    </small>
+
+                    <br>
+
+                    <button
+                        class="remove-btn"
+                        onclick="removeFromCart(${index})"
+                    >
+                        Remove
+                    </button>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+
+    cartTotal.innerText =
+        "Total: ₹" +
+        total.toFixed(2);
+
+}
+
+
+/* =====================================================
+   REMOVE FROM CART
+====================================================== */
+
+function removeFromCart(index) {
+
+    cart.splice(index, 1);
+
+    saveCart();
+
+    updateCart();
+
+}
+
+
+/* =====================================================
+   CHECKOUT
+====================================================== */
+
+function openCheckout() {
+
+    if (cart.length === 0) {
+
+        alert(
+            "Your cart is empty."
+        );
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "checkoutModal"
+    ).style.display = "flex";
+
+}
+
+
+function closeCheckout() {
+
+    document.getElementById(
+        "checkoutModal"
+    ).style.display = "none";
+
+}
+
+
+/* =====================================================
+   PLACE ORDER
+====================================================== */
+
+async function placeOrder() {
+
+    const buyerName =
+        document.getElementById("buyerName").value.trim();
+
+    const buyerPhone =
+        document.getElementById("buyerPhone").value.trim();
+
+    const buyerAddress =
+        document.getElementById("buyerAddress").value.trim();
+
+
+    // Check checkout details
+    if (
+        !buyerName ||
+        !buyerPhone ||
+        !buyerAddress
+    ) {
+
+        alert("Please fill all checkout details.");
+        return;
+
+    }
+
+
+    // Check cart
+    if (cart.length === 0) {
+
+        alert("Your cart is empty.");
+        return;
+
+    }
+
+
+    try {
+
+        // Disable button while placing order
+        const button =
+            document.querySelector(".confirm-btn");
+
+        button.disabled = true;
+
+        button.innerText =
+            "Placing Order...";
+
+
+        // Place every cart item as an order
+        for (const item of cart) {
+
+            const response =
+                await fetch(
+                    "http://localhost:5000/api/orders",
+                    {
+                        method: "POST",
+
+                        credentials: "include",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            productId:
+                                item.id,
+
+                            quantity:
+                                item.quantity,
+
+                            buyerName:
+                                buyerName,
+
+                            buyerPhone:
+                                buyerPhone,
+
+                            deliveryAddress:
+                                buyerAddress
+
+                        })
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Failed to place order."
+                );
+
+            }
+
+        }
+
+
+        // Clear cart after successful orders
+        cart = [];
+
+        saveCart();
+
+        updateCart();
+
+        closeCheckout();
+
+
+        // Clear checkout fields
+        document.getElementById(
+            "buyerName"
+        ).value = "";
+
+        document.getElementById(
+            "buyerPhone"
+        ).value = "";
+
+        document.getElementById(
+            "buyerAddress"
+        ).value = "";
+
+
+        alert(
+            "🎉 Order placed successfully!\n\nYour order has been sent to the farmer."
+        );
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Order error:",
+            error
+        );
+
+
+        alert(
+            "❌ " + error.message
+        );
+
+    }
+
+    finally {
+
+        const button =
+            document.querySelector(".confirm-btn");
+
+        button.disabled = false;
+
+        button.innerText =
+            "Confirm Order";
+
+    }
+
+}
+
+/* =====================================================
+   ESCAPE HTML
+====================================================== */
+
+function escapeHTML(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =====================================================
+   LOGOUT
+====================================================== */
+
+async function logout() {
+
+    try {
+
+        await fetch(
+            "http://localhost:5000/api/logout",
+            {
+                method: "POST",
+                credentials: "include"
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+    }
+
+
+    localStorage.removeItem(
+        "farmoraCurrentUser"
+    );
+
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+/* =====================================================
+   SEARCH EVENTS
+====================================================== */
+
+document.getElementById(
+    "searchInput"
+).addEventListener(
+    "input",
+    displayProducts
+);
+
+
+document.getElementById(
+    "locationInput"
+).addEventListener(
+    "input",
+    displayProducts
+);
+
+
+document.getElementById(
+    "categoryFilter"
+).addEventListener(
+    "change",
+    displayProducts
+);
+
+
+/* =====================================================
+   INITIAL LOAD
+====================================================== */
+
+loadProducts();
+
+updateCart();
+
+</script>
+
+</body>
+</html>
