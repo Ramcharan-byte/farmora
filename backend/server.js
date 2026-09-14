@@ -24,7 +24,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
     cors({
-        origin: "http://localhost:5000",
+        origin: [
+            "http://localhost:5500",
+            "http://127.0.0.1:5500"
+        ],
         credentials: true
     })
 );
@@ -64,9 +67,11 @@ app.use(express.static(path.join(__dirname, "..")));
 // ==========================================
 
 app.get("/", (req, res) => {
+
     res.sendFile(
         path.join(__dirname, "..", "index.html")
     );
+
 });
 
 
@@ -87,6 +92,8 @@ app.post("/api/signup", async (req, res) => {
         } = req.body;
 
 
+        // Check all fields
+
         if (
             !name ||
             !email ||
@@ -96,11 +103,17 @@ app.post("/api/signup", async (req, res) => {
         ) {
 
             return res.status(400).json({
+
+                success: false,
+
                 message: "Please fill all fields."
+
             });
 
         }
 
+
+        // Check role
 
         if (
             role !== "farmer" &&
@@ -108,35 +121,55 @@ app.post("/api/signup", async (req, res) => {
         ) {
 
             return res.status(400).json({
+
+                success: false,
+
                 message: "Invalid role."
+
             });
 
         }
 
 
-        const [existingUsers] = await db.promise().query(
-            "SELECT id FROM users WHERE email = ?",
-            [email]
-        );
+        // Check existing user
+
+        const [existingUsers] =
+            await db.promise().query(
+
+                "SELECT id FROM users WHERE email = ?",
+
+                [email]
+
+            );
 
 
         if (existingUsers.length > 0) {
 
             return res.status(400).json({
+
+                success: false,
+
                 message: "Email already registered."
+
             });
 
         }
 
 
+        // Hash password
+
         const passwordHash =
             await bcrypt.hash(password, 10);
 
 
+        // Insert user
+
         await db.promise().query(
+
             `INSERT INTO users
             (name, email, phone, password_hash, role)
             VALUES (?, ?, ?, ?, ?)`,
+
             [
                 name,
                 email,
@@ -144,24 +177,45 @@ app.post("/api/signup", async (req, res) => {
                 passwordHash,
                 role
             ]
+
         );
 
 
+        console.log(
+            "✅ Account created:",
+            email,
+            "Role:",
+            role
+        );
+
+
+        // Successful response
+
         res.status(201).json({
+
+            success: true,
+
             message: "Account created successfully."
+
         });
 
     }
 
+
     catch (error) {
 
         console.error(
-            "Signup error:",
+            "❌ Signup error:",
             error
         );
 
+
         res.status(500).json({
+
+            success: false,
+
             message: "Server error."
+
         });
 
     }
@@ -191,37 +245,57 @@ app.post("/api/login", async (req, res) => {
         );
 
 
-        if (!email || !password || !role) {
+        if (
+            !email ||
+            !password ||
+            !role
+        ) {
 
             return res.status(400).json({
-                message: "Email, password and role are required."
+
+                success: false,
+
+                message:
+                    "Email, password and role are required."
+
             });
 
         }
 
 
-        const [users] = await db.promise().query(
-            `SELECT
-                id,
-                name,
-                email,
-                phone,
-                password_hash,
-                role
-             FROM users
-             WHERE email = ?
-             AND role = ?`,
-            [
-                email,
-                role
-            ]
-        );
+        // Find user
+
+        const [users] =
+            await db.promise().query(
+
+                `SELECT
+                    id,
+                    name,
+                    email,
+                    phone,
+                    password_hash,
+                    role
+                 FROM users
+                 WHERE email = ?
+                 AND role = ?`,
+
+                [
+                    email,
+                    role
+                ]
+
+            );
 
 
         if (users.length === 0) {
 
             return res.status(401).json({
-                message: "Invalid email, password or role."
+
+                success: false,
+
+                message:
+                    "Invalid email, password or role."
+
             });
 
         }
@@ -229,6 +303,8 @@ app.post("/api/login", async (req, res) => {
 
         const user = users[0];
 
+
+        // Compare password
 
         const passwordMatch =
             await bcrypt.compare(
@@ -240,7 +316,12 @@ app.post("/api/login", async (req, res) => {
         if (!passwordMatch) {
 
             return res.status(401).json({
-                message: "Invalid email, password or role."
+
+                success: false,
+
+                message:
+                    "Invalid email, password or role."
+
             });
 
         }
@@ -251,11 +332,17 @@ app.post("/api/login", async (req, res) => {
         // ======================================
 
         req.session.user = {
+
             id: user.id,
+
             name: user.name,
+
             email: user.email,
+
             phone: user.phone,
+
             role: user.role
+
         };
 
 
@@ -266,7 +353,7 @@ app.post("/api/login", async (req, res) => {
 
 
         // ======================================
-        // SAVE SESSION BEFORE RESPONSE
+        // SAVE SESSION
         // ======================================
 
         req.session.save((err) => {
@@ -278,8 +365,14 @@ app.post("/api/login", async (req, res) => {
                     err
                 );
 
+
                 return res.status(500).json({
-                    message: "Could not create login session."
+
+                    success: false,
+
+                    message:
+                        "Could not create login session."
+
                 });
 
             }
@@ -295,14 +388,23 @@ app.post("/api/login", async (req, res) => {
 
             res.json({
 
-                message: "Login successful.",
+                success: true,
+
+                message:
+                    "Login successful.",
 
                 user: {
+
                     id: user.id,
+
                     name: user.name,
+
                     email: user.email,
+
                     phone: user.phone,
+
                     role: user.role
+
                 }
 
             });
@@ -311,15 +413,22 @@ app.post("/api/login", async (req, res) => {
 
     }
 
+
     catch (error) {
 
         console.error(
-            "Login error:",
+            "❌ Login error:",
             error
         );
 
+
         res.status(500).json({
-            message: "Server error."
+
+            success: false,
+
+            message:
+                "Server error."
+
         });
 
     }
@@ -342,8 +451,12 @@ app.get("/api/me", (req, res) => {
     if (!req.session.user) {
 
         return res.status(401).json({
+
             loggedIn: false,
-            message: "Not logged in."
+
+            message:
+                "Not logged in."
+
         });
 
     }
@@ -371,12 +484,18 @@ app.post("/api/logout", (req, res) => {
         if (err) {
 
             console.error(
-                "Logout error:",
+                "❌ Logout error:",
                 err
             );
 
+
             return res.status(500).json({
-                message: "Logout failed."
+
+                success: false,
+
+                message:
+                    "Logout failed."
+
             });
 
         }
@@ -386,12 +505,18 @@ app.post("/api/logout", (req, res) => {
 
 
         res.json({
-            message: "Logged out successfully."
+
+            success: true,
+
+            message:
+                "Logged out successfully."
+
         });
 
     });
 
 });
+
 
 // ==========================================
 // ADD PRODUCT
@@ -402,18 +527,34 @@ app.post("/api/products", async (req, res) => {
     try {
 
         // Check farmer login
+
         if (!req.session.user) {
+
             return res.status(401).json({
-                message: "Please login first."
+
+                message:
+                    "Please login first."
+
             });
+
         }
 
-        // Only farmers can add products
-        if (req.session.user.role !== "farmer") {
+
+        // Only farmers
+
+        if (
+            req.session.user.role !== "farmer"
+        ) {
+
             return res.status(403).json({
-                message: "Only farmers can add produce."
+
+                message:
+                    "Only farmers can add produce."
+
             });
+
         }
+
 
         const {
             name,
@@ -425,7 +566,9 @@ app.post("/api/products", async (req, res) => {
             quality
         } = req.body;
 
+
         // Validate fields
+
         if (
             !name ||
             !category ||
@@ -434,36 +577,48 @@ app.post("/api/products", async (req, res) => {
             !price ||
             !location
         ) {
+
             return res.status(400).json({
-                message: "Please fill all required fields."
+
+                message:
+                    "Please fill all required fields."
+
             });
+
         }
 
-        // Insert into MySQL
-        const [result] = await db.promise().query(
-            `INSERT INTO products
-            (
-                farmer_id,
-                name,
-                category,
-                quantity,
-                unit,
-                price,
-                location,
-                quality
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-                req.session.user.id,
-                name,
-                category,
-                quantity,
-                unit,
-                price,
-                location,
-                quality || "Good"
-            ]
-        );
+
+        // Insert product
+
+        const [result] =
+            await db.promise().query(
+
+                `INSERT INTO products
+                (
+                    farmer_id,
+                    name,
+                    category,
+                    quantity,
+                    unit,
+                    price,
+                    location,
+                    quality
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+
+                [
+                    req.session.user.id,
+                    name,
+                    category,
+                    quantity,
+                    unit,
+                    price,
+                    location,
+                    quality || "Good"
+                ]
+
+            );
+
 
         console.log(
             "✅ Product added:",
@@ -472,33 +627,56 @@ app.post("/api/products", async (req, res) => {
             req.session.user.email
         );
 
+
         res.status(201).json({
 
-            message: "Produce added successfully.",
+            success: true,
+
+            message:
+                "Produce added successfully.",
 
             product: {
+
                 id: result.insertId,
-                farmer_id: req.session.user.id,
+
+                farmer_id:
+                    req.session.user.id,
+
                 name,
+
                 category,
+
                 quantity,
+
                 unit,
+
                 price,
+
                 location,
-                quality: quality || "Good"
+
+                quality:
+                    quality || "Good"
+
             }
 
         });
 
-    } catch (error) {
+    }
+
+
+    catch (error) {
 
         console.error(
             "❌ Add product error:",
             error
         );
 
+
         res.status(500).json({
-            message: "Failed to add product."
+
+            message:
+                "Failed to add product."
+
         });
 
     }
@@ -514,74 +692,104 @@ app.get("/api/products", async (req, res) => {
 
     try {
 
-        const [products] = await db.promise().query(
+        const [products] =
+            await db.promise().query(
 
-            `SELECT
-                products.id,
-                products.name,
-                products.category,
-                products.quantity,
-                products.unit,
-                products.price,
-                products.location,
-                products.quality,
-                products.created_at,
+                `SELECT
+                    products.id,
+                    products.name,
+                    products.category,
+                    products.quantity,
+                    products.unit,
+                    products.price,
+                    products.location,
+                    products.quality,
+                    products.created_at,
 
-                users.id AS farmer_id,
-                users.name AS farmer_name
+                    users.id AS farmer_id,
+                    users.name AS farmer_name
 
-            FROM products
+                FROM products
 
-            INNER JOIN users
-                ON products.farmer_id = users.id
+                INNER JOIN users
+                    ON products.farmer_id = users.id
 
-            ORDER BY products.created_at DESC`
+                ORDER BY products.created_at DESC`
 
-        );
+            );
+
 
         res.json(products);
 
-    } catch (error) {
+    }
+
+
+    catch (error) {
 
         console.error(
             "❌ Get products error:",
             error
         );
 
+
         res.status(500).json({
-            message: "Failed to load products."
+
+            message:
+                "Failed to load products."
+
         });
 
     }
 
 });
-// ==========================================
-// START SERVER
-// ==========================================
-// =====================================================
-// ORDERS API
-// =====================================================
 
+
+// ==========================================
+// ORDERS API
+// ==========================================
+
+
+// ==========================================
 // BUYER - PLACE ORDER
+// ==========================================
+
 app.post("/api/orders", async (req, res) => {
 
     try {
 
         // Check login
+
         if (!req.session.user) {
+
             return res.status(401).json({
-                message: "Please login first."
+
+                message:
+                    "Please login first."
+
             });
+
         }
 
-        // Only buyers can place orders
-        if (req.session.user.role !== "buyer") {
+
+        // Only buyers
+
+        if (
+            req.session.user.role !== "buyer"
+        ) {
+
             return res.status(403).json({
-                message: "Only buyers can place orders."
+
+                message:
+                    "Only buyers can place orders."
+
             });
+
         }
 
-        const buyerId = req.session.user.id;
+
+        const buyerId =
+            req.session.user.id;
+
 
         const {
             productId,
@@ -593,6 +801,7 @@ app.post("/api/orders", async (req, res) => {
 
 
         // Validate data
+
         if (
             !productId ||
             !quantity ||
@@ -600,55 +809,77 @@ app.post("/api/orders", async (req, res) => {
             !buyerPhone ||
             !deliveryAddress
         ) {
+
             return res.status(400).json({
-                message: "Please provide all order details."
+
+                message:
+                    "Please provide all order details."
+
             });
+
         }
 
 
-        // Get product + farmer information
-        const [products] = await db.promise().query(
-            `SELECT
-                products.id,
-                products.name,
-                products.quantity,
-                products.unit,
-                products.price,
-                products.farmer_id,
-                users.name AS farmer_name
-             FROM products
-             INNER JOIN users
-             ON products.farmer_id = users.id
-             WHERE products.id = ?`,
-            [productId]
-        );
+        // Get product + farmer
+
+        const [products] =
+            await db.promise().query(
+
+                `SELECT
+                    products.id,
+                    products.name,
+                    products.quantity,
+                    products.unit,
+                    products.price,
+                    products.farmer_id,
+                    users.name AS farmer_name
+
+                 FROM products
+
+                 INNER JOIN users
+                 ON products.farmer_id = users.id
+
+                 WHERE products.id = ?`,
+
+                [productId]
+
+            );
 
 
         if (products.length === 0) {
 
             return res.status(404).json({
-                message: "Product not found."
+
+                message:
+                    "Product not found."
+
             });
 
         }
 
 
-        const product = products[0];
+        const product =
+            products[0];
 
 
         // Check available quantity
+
         if (
             Number(quantity) >
             Number(product.quantity)
         ) {
 
             return res.status(400).json({
+
                 message:
                     `Only ${product.quantity} ${product.unit} available.`
+
             });
 
         }
 
+
+        // Calculate total
 
         const total =
             Number(product.price) *
@@ -656,8 +887,10 @@ app.post("/api/orders", async (req, res) => {
 
 
         // Insert order
+
         const [result] =
             await db.promise().query(
+
                 `INSERT INTO orders
                 (
                     buyer_id,
@@ -674,6 +907,7 @@ app.post("/api/orders", async (req, res) => {
                     status
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+
                 [
                     buyerId,
                     product.farmer_id,
@@ -688,18 +922,23 @@ app.post("/api/orders", async (req, res) => {
                     deliveryAddress,
                     "New Order"
                 ]
+
             );
 
 
-        // Reduce available product quantity
+        // Reduce quantity
+
         await db.promise().query(
+
             `UPDATE products
              SET quantity = quantity - ?
              WHERE id = ?`,
+
             [
                 quantity,
                 productId
             ]
+
         );
 
 
@@ -710,6 +949,8 @@ app.post("/api/orders", async (req, res) => {
 
 
         res.status(201).json({
+
+            success: true,
 
             message:
                 "Order placed successfully.",
@@ -746,6 +987,7 @@ app.post("/api/orders", async (req, res) => {
 
     }
 
+
     catch (error) {
 
         console.error(
@@ -753,9 +995,12 @@ app.post("/api/orders", async (req, res) => {
             error
         );
 
+
         res.status(500).json({
+
             message:
                 "Failed to place order."
+
         });
 
     }
@@ -763,34 +1008,39 @@ app.post("/api/orders", async (req, res) => {
 });
 
 
-// =====================================================
+// ==========================================
 // FARMER - GET THEIR ORDERS
-// =====================================================
+// ==========================================
 
 app.get("/api/farmer/orders", async (req, res) => {
 
     try {
 
         // Check login
+
         if (!req.session.user) {
 
             return res.status(401).json({
+
                 message:
                     "Please login first."
+
             });
 
         }
 
 
         // Only farmers
+
         if (
-            req.session.user.role !==
-            "farmer"
+            req.session.user.role !== "farmer"
         ) {
 
             return res.status(403).json({
+
                 message:
                     "Only farmers can view farmer orders."
+
             });
 
         }
@@ -802,6 +1052,7 @@ app.get("/api/farmer/orders", async (req, res) => {
 
         const [orders] =
             await db.promise().query(
+
                 `SELECT
                     orders.id,
                     orders.product_id,
@@ -816,18 +1067,25 @@ app.get("/api/farmer/orders", async (req, res) => {
                     orders.status,
                     orders.created_at,
                     users.name AS farmer_name
+
                  FROM orders
+
                  INNER JOIN users
                  ON orders.farmer_id = users.id
+
                  WHERE orders.farmer_id = ?
+
                  ORDER BY orders.created_at DESC`,
+
                 [farmerId]
+
             );
 
 
         res.json(orders);
 
     }
+
 
     catch (error) {
 
@@ -836,9 +1094,12 @@ app.get("/api/farmer/orders", async (req, res) => {
             error
         );
 
+
         res.status(500).json({
+
             message:
                 "Failed to load orders."
+
         });
 
     }
@@ -846,9 +1107,9 @@ app.get("/api/farmer/orders", async (req, res) => {
 });
 
 
-// =====================================================
+// ==========================================
 // FARMER - UPDATE ORDER STATUS
-// =====================================================
+// ==========================================
 
 app.patch(
     "/api/orders/:id/status",
@@ -857,25 +1118,30 @@ app.patch(
         try {
 
             // Check login
+
             if (!req.session.user) {
 
                 return res.status(401).json({
+
                     message:
                         "Please login first."
+
                 });
 
             }
 
 
             // Only farmers
+
             if (
-                req.session.user.role !==
-                "farmer"
+                req.session.user.role !== "farmer"
             ) {
 
                 return res.status(403).json({
+
                     message:
                         "Only farmers can update orders."
+
                 });
 
             }
@@ -884,6 +1150,7 @@ app.patch(
             const orderId =
                 req.params.id;
 
+
             const { status } =
                 req.body;
 
@@ -891,64 +1158,81 @@ app.patch(
             const allowedStatuses = [
 
                 "New Order",
+
                 "Accepted",
+
                 "Preparing",
+
                 "Ready for Pickup",
+
                 "Picked Up",
+
                 "In Transit",
+
                 "Delivered",
+
                 "Rejected"
 
             ];
 
 
             if (
-                !allowedStatuses.includes(
-                    status
-                )
+                !allowedStatuses.includes(status)
             ) {
 
                 return res.status(400).json({
+
                     message:
                         "Invalid order status."
+
                 });
 
             }
 
 
-            // Make sure this order belongs
-            // to this farmer
+            // Check order belongs to farmer
+
             const [orders] =
                 await db.promise().query(
+
                     `SELECT id
                      FROM orders
                      WHERE id = ?
                      AND farmer_id = ?`,
+
                     [
                         orderId,
                         req.session.user.id
                     ]
+
                 );
 
 
             if (orders.length === 0) {
 
                 return res.status(404).json({
+
                     message:
                         "Order not found."
+
                 });
 
             }
 
 
+            // Update status
+
             await db.promise().query(
+
                 `UPDATE orders
                  SET status = ?
                  WHERE id = ?`,
+
                 [
                     status,
                     orderId
                 ]
+
             );
 
 
@@ -958,6 +1242,8 @@ app.patch(
 
 
             res.json({
+
+                success: true,
 
                 message:
                     "Order status updated.",
@@ -972,6 +1258,7 @@ app.patch(
 
         }
 
+
         catch (error) {
 
             console.error(
@@ -979,19 +1266,24 @@ app.patch(
                 error
             );
 
+
             res.status(500).json({
+
                 message:
                     "Failed to update order."
+
             });
 
         }
 
     }
 );
-app.listen(PORT, () => {
 
-    console.log(
-        `🚀 Farmora server running on http://localhost:${PORT}`
-    );
 
+// ==========================================
+// START SERVER
+// ==========================================
+
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 Farmora server running on port ${PORT}`);
 });
