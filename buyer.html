@@ -386,7 +386,7 @@
     try {
 
         const response = await fetch(
-            "http://localhost:5000/api/me",
+            "/api/me"
             {
                 credentials: "include"
             }
@@ -772,7 +772,7 @@ async function loadProducts() {
     try {
 
         const response = await fetch(
-            "http://localhost:5000/api/products"
+            "/api/me"
         );
 
         if (!response.ok) {
@@ -1330,7 +1330,7 @@ async function placeOrder() {
 
             const response =
                 await fetch(
-                    "http://localhost:5000/api/orders",
+                    "/api/me"
                     {
                         method: "POST",
 
@@ -1493,9 +1493,9 @@ async function logout() {
     try {
 
         await fetch(
-            "http://localhost:5000/api/logout",
+            "/api/me",
             {
-                method: "POST",
+                method: "Get",
                 credentials: "include"
             }
         );
