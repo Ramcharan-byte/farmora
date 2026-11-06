@@ -458,12 +458,9 @@
             🛒 Marketplace
         </a>
 
-        <button
-            class="logout-btn"
-            onclick="logout()"
-        >
-            Logout
-        </button>
+        <button class="category-btn" onclick="selectCategory('Vegetables')">
+    🥕 Vegetables
+</button>
 
     </div>
 
@@ -771,9 +768,7 @@ async function loadProducts() {
 
     try {
 
-        const response = await fetch(
-            "/api/me"
-        );
+       const response = await fetch("/api/products");
 
         if (!response.ok) {
 
@@ -1330,7 +1325,7 @@ async function placeOrder() {
 
             const response =
                 await fetch(
-                    "/api/me"
+                    "/api/me",
                     {
                         method: "POST",
 
@@ -1548,7 +1543,20 @@ document.getElementById(
     "change",
     displayProducts
 );
+/* =====================================================
+   CATEGORY SELECTION
+====================================================== */
 
+function selectCategory(category) {
+
+    document.getElementById("categoryFilter").value = category;
+
+    document.querySelectorAll(".category-btn").forEach(button => {
+        button.classList.remove("active");
+    });
+
+    displayProducts();
+}
 
 /* =====================================================
    INITIAL LOAD

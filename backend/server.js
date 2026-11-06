@@ -79,7 +79,7 @@ app.get("/", (req, res) => {
 // SIGNUP
 // ==========================================
 
-app.post("/api/signup", async (req, res) => {
+("/api/signup", async (req, res) => {
 
     try {
 
@@ -110,7 +110,7 @@ app.post("/api/signup", async (req, res) => {
 
             });
 
-        }
+        }app.post
 
 
         // Check role
